@@ -37,10 +37,9 @@ app.include_router(api_router)
 async def supabase_test():
     """
     Verify that the Supabase client can talk to your project.
-    Returns a few rows (or an empty list) from the `products` table.
     """
     try:
         data = test_connection()
-        return {"connected": True, "sample_data": data}
-    except Exception as exc:
-        raise HTTPException(status_code=500, detail=str(exc))
+        return {"connected": True, "table_exists": data.get("table_exists", False)}
+    except Exception:
+        raise HTTPException(status_code=500, detail="Database connection check failed.")

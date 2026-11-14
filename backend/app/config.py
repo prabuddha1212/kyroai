@@ -22,7 +22,10 @@ class Settings:
     ADMIN_KEY: str = os.getenv("ADMIN_KEY", "storelab-admin-2026")
     
     # CORS
-    RAW_ORIGINS: str = os.getenv("ALLOWED_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
+    RAW_ORIGINS: str = os.getenv(
+        "ALLOWED_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000,https://kyroai-eight.vercel.app"
+    )
     
     @property
     def ALLOWED_ORIGINS(self) -> List[str]:

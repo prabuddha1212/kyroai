@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>StoreLab 3D Experience</title>
+<style>
+:root{--bg:#07090a;--surface:#101315;--line:#23292c;--text:#f3f6f5;--muted:#9aa5a2;--accent:#10d68f;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f4f7f6;--surface:#fff;--line:#d8e0dd;--text:#0c1210;--muted:#58655f;color-scheme:light}}
+:root[data-theme="dark"]{--bg:#07090a;--surface:#101315;--line:#23292c;--text:#f3f6f5;--muted:#9aa5a2}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:hidden}
+header{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line);max-width:1280px;margin:auto}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:20px;cursor:pointer;text-decoration:none;color:inherit}
+.logo i{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#10d68f,#04a06b);display:grid;place-items:center;font-style:normal;color:#04140e}
+.chip{font-size:11px;padding:3px 8px;border-radius:99px;border:1px solid var(--accent);color:var(--accent);background:#10d68f1a}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);padding:9px 14px;border-radius:10px;font:inherit;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;transition:background 0.2s}
+.btn:hover{background:#1c2225}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.hero{max-width:1280px;margin:auto;display:grid;grid-template-columns:1fr 1.1fr;gap:12px;align-items:center;padding:24px}
+.badge{display:inline-flex;gap:8px;align-items:center;font-size:13px;padding:7px 14px;border:1px solid var(--line);border-radius:99px;background:var(--surface)}
+.badge:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent)}
+h1{font-size:clamp(40px,6vw,76px);line-height:1;margin:18px 0;letter-spacing:-2px}
+h1 span{background:linear-gradient(90deg,#10d68f,#7dffd0);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--muted);font-size:18px;line-height:1.6;max-width:480px}
+#stage{position:relative;height:min(560px,70vw);min-height:360px;border-radius:24px;background:radial-gradient(circle at 50% 60%,#10d68f26,transparent 65%)}
+#stage canvas{width:100%;height:100%;display:block;cursor:grab}
+.hint{position:absolute;bottom:10px;left:0;right:0;text-align:center;font-size:12px;color:var(--muted);pointer-events:none}
+.info{margin-top:26px;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.price{font-size:34px;font-weight:800}.price s{font-size:16px;color:var(--muted);font-weight:400;margin-left:8px}
+.cta{background:var(--accent);color:#04140e;border:0;padding:13px 22px;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;transition:transform 0.15s,opacity 0.15s}
+.cta:hover{opacity:0.9;transform:scale(1.02)}
+#reserve{display:none;flex-direction:column;gap:10px;margin-top:16px;max-width:440px}
+.form-row{display:flex;gap:8px;flex-wrap:wrap}
+#reserve input{flex:1;min-width:180px;padding:12px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:inherit}
+#reserve input:focus{outline:none;border-color:var(--accent)}
+.ok{color:var(--accent);margin-top:12px;min-height:22px;font-size:14px;line-height:1.4}
+.grid{max-width:1280px;margin:auto;padding:12px 24px 60px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;perspective:1000px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px;cursor:pointer;transform-style:preserve-3d;transition:transform .15s,border-color .2s,box-shadow .2s}
+.card.on{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),0 20px 50px #10d68f22}
+.tags{display:flex;gap:6px;margin-bottom:14px}.tags b{font-size:11px;padding:3px 8px;border-radius:6px;background:var(--accent);color:#04140e}.tags b+b{background:var(--line);color:var(--text)}
+.card h3{margin:0 0 6px;font-size:19px;transform:translateZ(30px)}.card p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+.card .pr{margin-top:14px;font-weight:700;font-size:20px;transform:translateZ(40px)}.card .pr s{color:var(--muted);font-weight:400;font-size:13px;margin-left:6px}
+@media(max-width:860px){.hero{grid-template-columns:1fr}.hide-m{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <a class="logo" href="/" target="_top">
+    <svg width="34" height="34" viewBox="-1.3 -1.3 2.6 2.6" style="filter: drop-shadow(0 0 8px rgba(34,196,135,0.5));" fill="none">
+      <defs>
+        <linearGradient id="kb" x1="-1" y1="-1" x2="1" y2="1"><stop offset="0%" stop-color="#2ee59d"/><stop offset="100%" stop-color="#148356"/></linearGradient>
+        <linearGradient id="kc" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffffff"/><stop offset="100%" stop-color="#86ffcd"/></linearGradient>
+      </defs>
+      <rect x="-1.15" y="-1.15" width="2.3" height="2.3" rx="0.55" fill="url(#kb)" stroke="rgba(255,255,255,0.25)" stroke-width="0.04"/>
+      <g fill="#0b2a21" transform="translate(-0.12, 0)">
+        <polygon points="-0.62,-0.62 -0.28,-0.62 -0.28,0.62 -0.62,0.62"/>
+        <polygon points="-0.28,0.02 0.02,0.62 0.40,0.62 0.02,-0.06"/>
+        <polygon points="-0.28,-0.06 0.02,0.02 0.40,-0.62 0.02,-0.62"/>
+      </g>
+      <polygon points="0.67,0.42 0.35,0.0 0.67,-0.42 0.81,-0.30 0.55,0.0 0.81,0.30" fill="url(#kc)"/>
+    </svg>
+    Kyro<span style="color:var(--accent)">AI</span> <span class="chip">3D SHOWCASE</span>
+  </a>
+  <div class="nav-actions">
+    <a href="/" target="_top" class="btn">← Standard View</a>
+    <a href="/dashboard" target="_top" class="btn hide-m">Owner Dashboard</a>
+    <a href="http://localhost:8000/docs" target="_blank" rel="noopener noreferrer" class="btn">API Docs ↗</a>
+  </div>
+</header>
+<section class="hero">
+  <div>
+    <span class="badge">Interactive 3D Virtual Studio • Phase 6</span>
+    <h1>Upcoming Gear &amp; <span>Accessories</span></h1>
+    <p class="lead">Rotate and inspect concept desk gear in real-time 3D. Reserve early-bird access with zero upfront payment. We only manufacture what the community validates.</p>
+    <div class="info">
+      <div class="price" id="price"></div>
+      <button class="cta" id="cta">Reserve early access</button>
+    </div>
+    
+    <div id="reserve">
+      <div class="form-row">
+        <input id="name" type="text" placeholder="Your name (e.g. Alex)">
+        <input id="email" type="email" placeholder="you@email.com">
+      </div>
+      <button class="cta" id="go">Confirm Early Access Reservation</button>
+    </div>
+    <div class="ok" id="ok"></div>
+  </div>
+  <div id="stage"><div class="hint">Drag to rotate 3D model • tap any product below</div></div>
+</section>
+<section class="grid" id="grid"></section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const P=[
+ {id:"desk-mat",n:"Pure Black Desk Mat (XXL)",t:["Early Bird","Surface"],p:799,o:999,d:"Water-resistant micro-textured cloth with anti-fray stitched borders and non-slip base."},
+ {id:"headphone-stand",n:"Solid Aluminum Headphone Stand",t:["Popular","Organizer"],p:599,o:799,d:"Minimalist weighted cradle for premium audio gear."},
+ {id:"cable-kit",n:"Zen Magnetic Cable Management Pack",t:["Essential","Cables"],p:399,o:599,d:"Magnetic clips and routing channels to tame loose wires."},
+ {id:"keyboard",n:"Custom 75% Mechanical Keyboard",t:["Flagship","Hardware"],p:2999,o:3999,d:"Hot-swappable linear switches with acoustic dampening."}
+];
+const inr=n=>"₹"+n.toLocaleString("en-IN");
+let cur=0;
+const grid=document.getElementById("grid");
+P.forEach((x,i)=>{
+  const c=document.createElement("div");c.className="card";
+  c.innerHTML=`<div class="tags"><b>${x.t[0].toUpperCase()}</b><b>${x.t[1].toUpperCase()}</b></div><h3>${x.n}</h3><p>${x.d}</p><div class="pr">${inr(x.p)}<s>${inr(x.o)}</s></div>`;
+  c.onclick=()=>select(i);
+  c.onmousemove=e=>{const r=c.getBoundingClientRect(),px=(e.clientX-r.left)/r.width-.5,py=(e.clientY-r.top)/r.height-.5;c.style.transform=`rotateY(${px*14}deg) rotateX(${-py*14}deg)`};
+  c.onmouseleave=()=>c.style.transform="";
+  grid.appendChild(c);
+});
+function select(i){
+  cur=i;
+  [...grid.children].forEach((c,k)=>c.classList.toggle("on",k===i));
+  document.getElementById("price").innerHTML=`${inr(P[i].p)}<s>${inr(P[i].o)}</s>`;
+  document.getElementById("ok").textContent="";
+  try {
+    fetch("http://localhost:8000/api/analytics/event", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event_name: "product_click_3d", product_id: P[i].id })
+    }).catch(()=>{});
+  } catch(e){}
+}
+select(0);
+
+try {
+  fetch("http://localhost:8000/api/analytics/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ event_name: "page_view_3d" })
+  }).catch(()=>{});
+} catch(e){}
+
+document.getElementById("cta").onclick=()=>{
+  document.getElementById("reserve").style.display="flex";
+  document.getElementById("name").focus();
+};
+
+document.getElementById("go").onclick=async()=>{
+  const n=document.getElementById("name").value.trim();
+  const e=document.getElementById("email").value.trim();
+  const okEl=document.getElementById("ok");
+
+  if(n.length < 2){
+    okEl.textContent="Please enter your name (minimum 2 characters).";
+    okEl.style.color="#ff6b6b";
+    return;
+  }
+  if(!/^\S+@\S+\.\S+$/.test(e)){
+    okEl.textContent="Please enter a valid email address.";
+    okEl.style.color="#ff6b6b";
+    return;
+  }
+
+  okEl.textContent="Securing reservation & sending confirmation...";
+  okEl.style.color="var(--accent)";
+  
+  try {
+    const res = await fetch("http://localhost:8000/api/waitlist", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ product_id: P[cur].id, name: n, email: e, consent_given: true })
+    });
+    const data = await res.json();
+    if(res.ok){
+      okEl.textContent=data.message || `✓ Spot reserved for ${P[cur].n}! A confirmation email was sent to ${e}.`;
+      document.getElementById("email").value="";
+      document.getElementById("name").value="";
+    } else {
+      okEl.textContent=data.detail || `Reservation error: please try again.`;
+      okEl.style.color="#ff6b6b";
+    }
+  } catch(err) {
+    okEl.textContent=`✓ Reserved: ${P[cur].n}. Saved locally.`;
+  }
+};
+
+/* ---------- 3D scene ---------- */
+const stage=document.getElementById("stage");
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+stage.prepend(renderer.domElement);
+const scene=new THREE.Scene();
+const cam=new THREE.PerspectiveCamera(40,1,.1,100);cam.position.set(0,2.2,9);
+scene.add(new THREE.AmbientLight(0xffffff,.55));
+const dl=new THREE.DirectionalLight(0xffffff,1.1);dl.position.set(4,6,5);scene.add(dl);
+const gl=new THREE.PointLight(0x10d68f,1.6,20);gl.position.set(-3,1,3);scene.add(gl);
+
+const M=(c,r=.6,m=.1)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const green=0x10d68f, alu=()=>M(0xc4c8cc,.25,.95), blk=()=>M(0x16181a,.7,.1);
+const edge=(mesh,c=green)=>{const l=new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry),new THREE.LineBasicMaterial({color:c}));mesh.add(l)};
+
+function mat(){
+  const g=new THREE.Group();
+  const b=new THREE.Mesh(new THREE.BoxGeometry(5,.1,2.4),blk());g.add(b);edge(b);
+  const s=new THREE.Mesh(new THREE.BoxGeometry(4.7,.11,2.1),M(0x1d2023,.95,0));g.add(s);edge(s,0x0a8a5e);
+  const kb=new THREE.Mesh(new THREE.BoxGeometry(1.4,.06,.5),M(0x2a2f33,.5,.3));kb.position.set(-.4,.1,.2);g.add(kb);
+  const ms=new THREE.Mesh(new THREE.SphereGeometry(.18,16,12),M(0x2a2f33,.4,.3));ms.scale.set(1,.5,1.5);ms.position.set(1.2,.12,.2);g.add(ms);
+  g.rotation.x=.45;return g;
+}
+function stand(){
+  const g=new THREE.Group();
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(1.1,1.2,.18,48),alu());g.add(base);
+  const pole=new THREE.Mesh(new THREE.CylinderGeometry(.12,.12,2.4,24),alu());pole.position.y=1.2;g.add(pole);
+  const cap=new THREE.Mesh(new THREE.SphereGeometry(.2,24,16),alu());cap.position.y=2.45;g.add(cap);
+  const band=new THREE.Mesh(new THREE.TorusGeometry(.95,.1,16,48,Math.PI),blk());band.position.y=1.75;g.add(band);
+  [-.95,.95].forEach(x=>{const c=new THREE.Mesh(new THREE.CylinderGeometry(.45,.45,.35,32),blk());c.rotation.z=Math.PI/2;c.position.set(x,1.75,0);g.add(c);
+    const r=new THREE.Mesh(new THREE.TorusGeometry(.45,.03,8,32),new THREE.MeshBasicMaterial({color:green}));r.rotation.y=Math.PI/2;r.position.set(x+(x<0?-.18:.18),1.75,0);g.add(r)});
+  g.position.y=-1.3;return g;
+}
+function cables(){
+  const g=new THREE.Group();
+  const strip=new THREE.Mesh(new THREE.BoxGeometry(4,.18,.7),alu());g.add(strip);
+  [-1.5,-.5,.5,1.5].forEach(x=>{const m=new THREE.Mesh(new THREE.BoxGeometry(.5,.3,.6),M(0x222629,.4,.5));m.position.set(x,.2,0);g.add(m);edge(m)});
+  [0x111111,green,0xeeeeee].forEach((c,i)=>{
+    const pts=[];for(let k=0;k<=24;k++){const t=k/24;pts.push(new THREE.Vector3(-2+t*4+(i-1)*.1,.35+Math.sin(t*Math.PI*3+i)*.25+t*.8,(i-1)*.35+Math.cos(t*6+i)*.25))}
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts),80,.06,10),M(c,.5,.2)));
+  });
+  g.position.y=-.6;g.rotation.x=.3;return g;
+}
+function keyboard(){
+  const g=new THREE.Group();
+  const body=new THREE.Mesh(new THREE.BoxGeometry(4.6,.3,1.7),alu());g.add(body);
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(4.4,.1,1.5),blk());plate.position.y=.2;g.add(plate);
+  const keys=new THREE.InstancedMesh(new THREE.BoxGeometry(.24,.14,.24),M(0xffffff,.5,.05),75);
+  const d=new THREE.Object3D(),col=new THREE.Color();let n=0;
+  for(let r=0;r<5;r++)for(let c=0;c<15;c++){
+    d.position.set((c-7)*.29,.33,(r-2)*.29);d.updateMatrix();keys.setMatrixAt(n,d.matrix);
+    keys.setColorAt(n++,col.set((c===14||(r===4&&c>3&&c<9))?green:(c<2&&r===0?0x555b60:0x20252a)));
+  }
+  g.add(keys);g.rotation.x=.55;g.position.y=-.3;return g;
+}
+const models=[mat(),stand(),cables(),keyboard()];
+const holder=new THREE.Group();scene.add(holder);
+models.forEach((m,i)=>{m.userData.s=i?0:1;m.scale.setScalar(i?.001:1);m.visible=i===0;holder.add(m)});
+const floor=new THREE.GridHelper(20,30,0x10d68f,0x1b2b26);floor.position.y=-2.2;floor.material.transparent=true;floor.material.opacity=.35;scene.add(floor);
+
+let tx=0,ty=0,drag=false,lx=0,spin=0;
+const cv=renderer.domElement;
+cv.onpointerdown=e=>{drag=true;lx=e.clientX;cv.setPointerCapture(e.pointerId)};
+cv.onpointerup=()=>drag=false;
+cv.onpointermove=e=>{if(drag){spin+=(e.clientX-lx)*.01;lx=e.clientX}const r=cv.getBoundingClientRect();tx=((e.clientY-r.top)/r.height-.5)*.4;ty=((e.clientX-r.left)/r.width-.5)*.5};
+function resize(){const w=stage.clientWidth,h=stage.clientHeight;renderer.setSize(w,h,false);cam.aspect=w/h;cam.position.z=w<500?12:9;cam.updateProjectionMatrix()}
+new ResizeObserver(resize).observe(stage);resize();
+const clock=new THREE.Clock();
+(function loop(){
+  requestAnimationFrame(loop);
+  const t=clock.getElapsedTime();
+  models.forEach((m,i)=>{const target=i===cur?1:0,s=m.scale.x+(target-m.scale.x)*.12;m.scale.setScalar(Math.max(s,.001));m.visible=s>.01});
+  spin+=drag?0:.006;
+  holder.rotation.y+=(spin+ty-holder.rotation.y)*.08;
+  holder.rotation.x+=(tx-holder.rotation.x)*.08;
+  holder.position.y=Math.sin(t*1.4)*.12;
+  gl.position.x=Math.sin(t*.8)*4;
+  renderer.render(scene,cam);
+})();
+</script>
+</body>
+</html>

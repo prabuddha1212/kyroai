@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KyroAI 3D Logo Reveal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;700&display=swap">
+<style>
+:root{--bg:#050b0a;--green:#22c487;--ink:#e9f1ee;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--ink);color-scheme:dark;overflow:hidden}
+body{font-family:"Sora",system-ui,-apple-system,"Segoe UI",sans-serif}
+.stage{position:relative;height:100%;display:flex;align-items:center;justify-content:center;gap:clamp(4px,2vw,28px);flex-wrap:wrap;padding:16px;
+ background:radial-gradient(60% 50% at 50% 55%,rgba(34,196,135,.16),transparent 70%),radial-gradient(40% 30% at 50% 100%,rgba(34,196,135,.10),transparent 80%)}
+#c{width:min(72vw,360px);height:min(72vw,360px);display:block;flex:none}
+.word{font-size:clamp(44px,9vw,84px);font-weight:700;letter-spacing:-.03em;display:flex;line-height:1;perspective:700px}
+.word span{display:inline-block;opacity:0;transform:translateY(40px) rotateX(-80deg);transform-origin:50% 100%}
+.word .ai{color:var(--green);text-shadow:0 0 0 rgba(34,196,135,0)}
+.play .word span{animation:in .9s cubic-bezier(.2,.9,.25,1.15) forwards;animation-delay:calc(1.5s + var(--i)*.07s)}
+.play .word .ai{animation-name:in,glow;animation-duration:.9s,2.8s;animation-delay:calc(1.5s + var(--i)*.07s),2.6s;animation-iteration-count:1,infinite;animation-fill-mode:forwards,none}
+@keyframes in{to{opacity:1;transform:none}}
+@keyframes glow{50%{text-shadow:0 0 28px rgba(34,196,135,.75)}}
+.line{position:absolute;left:50%;bottom:16%;height:2px;width:0;background:linear-gradient(90deg,transparent,var(--green),transparent);transform:translateX(-50%)}
+.play .line{animation:line 1.2s 2.2s ease-out forwards}
+@keyframes line{to{width:min(70vw,520px)}}
+button{position:absolute;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:20px;background:rgba(34,196,135,.12);color:var(--ink);border:1px solid rgba(34,196,135,.5);border-radius:999px;padding:10px 18px;font:500 14px "Sora",system-ui,sans-serif;cursor:pointer}
+button:hover{background:rgba(34,196,135,.25)}
+button:focus-visible{outline:2px solid var(--green);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.play .word span{animation-duration:.01s;animation-delay:0s}.play .line{animation-duration:.01s;animation-delay:0s}}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+  <canvas id="c" aria-label="KyroAI 3D logo icon"></canvas>
+  <div class="word" aria-label="KyroAI">
+    <span style="--i:0">K</span><span style="--i:1">y</span><span style="--i:2">r</span><span style="--i:3">o</span><span class="ai" style="--i:4">A</span><span class="ai" style="--i:5">I</span>
+  </div>
+  <div class="line"></div>
+  <button id="replay" type="button">Replay</button>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+  var canvas=document.getElementById('c'),stage=document.getElementById('stage');
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var renderer=new THREE.WebGLRenderer({canvas:canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  var scene=new THREE.Scene();
+  var camera=new THREE.PerspectiveCamera(35,1,0.1,50);camera.position.set(0,0,7.4);
+
+  scene.add(new THREE.AmbientLight(0x88ffd0,0.45));
+  var key=new THREE.PointLight(0x39ffb0,2.2,30);key.position.set(3,3,5);scene.add(key);
+  var rim=new THREE.PointLight(0x00c8ff,1.6,30);rim.position.set(-4,-2,3);scene.add(rim);
+  var top=new THREE.DirectionalLight(0xffffff,0.8);top.position.set(0,4,4);scene.add(top);
+
+  function rr(w,h,r){var s=new THREE.Shape(),x=-w/2,y=-h/2;
+    s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.quadraticCurveTo(x+w,y,x+w,y+r);s.lineTo(x+w,y+h-r);
+    s.quadraticCurveTo(x+w,y+h,x+w-r,y+h);s.lineTo(x+r,y+h);s.quadraticCurveTo(x,y+h,x,y+h-r);
+    s.lineTo(x,y+r);s.quadraticCurveTo(x,y,x+r,y);return s;}
+  function poly(p){var s=new THREE.Shape();s.moveTo(p[0][0],p[0][1]);for(var i=1;i<p.length;i++)s.lineTo(p[i][0],p[i][1]);s.closePath();return s;}
+  function ext(shape,depth,bevel){return new THREE.ExtrudeGeometry(shape,{depth:depth,bevelEnabled:true,bevelThickness:bevel,bevelSize:bevel,bevelSegments:4,curveSegments:20});}
+
+  var logo=new THREE.Group();scene.add(logo);
+  var baseMat=new THREE.MeshPhysicalMaterial({color:0x1fa56f,metalness:0.25,roughness:0.28,clearcoat:1,clearcoatRoughness:0.15,emissive:0x0a5a3a,emissiveIntensity:0.5});
+  var base=new THREE.Mesh(ext(rr(2.3,2.3,0.55),0.35,0.08),baseMat);base.position.z=-0.2;logo.add(base);
+
+  var darkMat=new THREE.MeshPhysicalMaterial({color:0x0b2a21,metalness:0.5,roughness:0.35,clearcoat:0.6});
+  var kg=new THREE.Group();
+  var stem=poly([[-0.62,-0.62],[-0.28,-0.62],[-0.28,0.62],[-0.62,0.62]]);
+  var up=poly([[-0.28,0.02],[0.02,0.62],[0.40,0.62],[0.02,-0.06]]);
+  var lo=poly([[-0.28,-0.06],[0.02,0.02],[0.40,-0.62],[0.02,-0.62]]);
+  [stem,up,lo].forEach(function(s){var m=new THREE.Mesh(ext(s,0.22,0.03),darkMat);kg.add(m);});
+  kg.position.set(-0.12,0,0.28);logo.add(kg);
+
+  var chevMat=new THREE.MeshPhysicalMaterial({color:0xdfffee,emissive:0x7dffc8,emissiveIntensity:0.8,roughness:0.2});
+  var chev=new THREE.Mesh(ext(poly([[0.62,0.42],[0.30,0.0],[0.62,-0.42],[0.76,-0.30],[0.50,0.0],[0.76,0.30]]),0.14,0.02),chevMat);
+  chev.position.set(0.05,0,0.46);logo.add(chev);
+
+  var ringGeo=new THREE.RingGeometry(1.5,1.56,64);
+  var ringMat=new THREE.MeshBasicMaterial({color:0x39ffb0,transparent:true,opacity:0,side:THREE.DoubleSide});
+  var ring=new THREE.Mesh(ringGeo,ringMat);ring.position.z=-0.3;scene.add(ring);
+
+  var N=160,pos=new Float32Array(N*3),vel=[];
+  for(var i=0;i<N;i++){var a=Math.random()*6.283,r=1.4+Math.random()*1.8;pos[i*3]=Math.cos(a)*r;pos[i*3+1]=Math.sin(a)*r;pos[i*3+2]=(Math.random()-.5)*2.5;vel.push(Math.random()*0.4+0.1);}
+  var pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  var pm=new THREE.PointsMaterial({color:0x39ffb0,size:0.045,transparent:true,opacity:0});
+  var pts=new THREE.Points(pg,pm);scene.add(pts);
+
+  var mx=0,my=0;
+  window.addEventListener('pointermove',function(e){mx=(e.clientX/innerWidth-.5)*2;my=(e.clientY/innerHeight-.5)*2;});
+
+  function size(){var s=Math.min(canvas.clientWidth,canvas.clientHeight)||300;renderer.setSize(s,s,false);camera.aspect=1;camera.updateProjectionMatrix();}
+  window.addEventListener('resize',size);size();
+
+  function easeOutBack(x){var c1=1.70158,c3=c1+1;return 1+c3*Math.pow(x-1,3)+c1*Math.pow(x-1,2);}
+  function easeOut(x){return 1-Math.pow(1-x,3);}
+  var t0=performance.now();
+  function play(){t0=performance.now();stage.classList.remove('play');void stage.offsetWidth;stage.classList.add('play');}
+  document.getElementById('replay').addEventListener('click',play);
+  play();
+
+  function frame(now){
+    var t=(now-t0)/1000;
+    var p=reduce?1:Math.min(t/1.6,1);
+    var s=Math.max(0.0001,easeOutBack(p));
+    logo.scale.setScalar(s);
+    var spin=(1-easeOut(p))*Math.PI*3;
+    var idle=reduce?0:Math.sin(t*0.9)*0.35;
+    logo.rotation.y=-spin+idle+mx*0.35;
+    logo.rotation.x=(1-easeOut(p))*0.6+my*0.25+(reduce?0:Math.cos(t*0.7)*0.06);
+    logo.position.y=reduce?0:Math.sin(t*1.4)*0.06;
+    // intro: K and chevron slide forward from the base
+    var kp=easeOut(Math.min(Math.max((t-0.7)/0.8,0),1));
+    kg.position.z=-0.2+0.48*kp;chev.position.z=-0.1+0.56*kp;
+    // shockwave ring
+    var rp=Math.min(Math.max((t-1.1)/1.2,0),1);
+    ring.scale.setScalar(1+rp*1.4);ringMat.opacity=rp>0&&rp<1?0.7*(1-rp):0;
+    // particles
+    pm.opacity=Math.min(t/1.5,1)*0.85;
+    var a=pg.attributes.position.array;
+    for(var i=0;i<N;i++){a[i*3+1]+=vel[i]*0.006;if(a[i*3+1]>2.6)a[i*3+1]=-2.6;}
+    pg.attributes.position.needsUpdate=true;
+    pts.rotation.y=t*0.08;
+    key.position.x=3*Math.cos(t*0.8);key.position.y=3*Math.sin(t*0.6);
+    renderer.render(scene,camera);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
+

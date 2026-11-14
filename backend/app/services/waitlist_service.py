@@ -76,6 +76,7 @@ class WaitlistService:
 
         except Exception as e:
             error_msg = str(e)
+            print(f"[WaitlistService] Supabase insertion error: {error_msg}", flush=True)
             if "23505" in error_msg or "duplicate" in error_msg.lower():
                 return {
                     "success": True,

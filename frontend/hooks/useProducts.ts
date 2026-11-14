@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Product } from "@/lib/types";
-import { getProducts } from "@/lib/api";
-import { FALLBACK_PRODUCTS } from "@/lib/constants";
+import { Product } from "../lib/types";
+import { getProducts } from "../lib/api";
+import { FALLBACK_PRODUCTS } from "../lib/constants";
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Product } from "@/lib/types";
+import { Product } from "../../lib/types";
 import { ProductCard } from "./ProductCard";
 import { ProductCardSkeleton } from "./ProductCardSkeleton";
 

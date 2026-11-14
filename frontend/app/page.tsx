@@ -10,8 +10,8 @@ import { PrivacyModal } from "@/components/waitlist/PrivacyModal";
 import { Alert } from "@/components/ui/Alert";
 import { useProducts } from "@/hooks/useProducts";
 import { useAnalytics } from "@/hooks/useAnalytics";
-import { Product, FeedbackState } from "@/lib/types";
-import { FALLBACK_PRODUCTS } from "@/lib/constants";
+import { Product, FeedbackState } from "../lib/types";
+import { FALLBACK_PRODUCTS } from "../lib/constants";
 
 export default function Home() {
   const { products, loading } = useProducts();

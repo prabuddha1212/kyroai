@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
-import { trackEvent as apiTrackEvent } from "@/lib/api";
+import { trackEvent as apiTrackEvent } from "../lib/api";
 
 export function useAnalytics() {
   const track = useCallback(

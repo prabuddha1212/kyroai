@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Product, FeedbackState } from "@/lib/types";
-import { joinWaitlist } from "@/lib/api";
+import { Product, FeedbackState } from "../../lib/types";
+import { joinWaitlist } from "../../lib/api";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface WaitlistFormProps {

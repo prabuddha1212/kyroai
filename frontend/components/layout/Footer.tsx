@@ -16,9 +16,9 @@ export function Footer({ onPrivacyClick }: FooterProps) {
         KyroAI • Next.js 16 + FastAPI + Supabase
       </span>
       <span className="hidden sm:inline">•</span>
-      <Link href="/kyro-reveal.html" target="_blank" className="text-emerald-400 hover:text-emerald-300 underline font-medium">
+      <a href="/kyro-reveal.html" target="_blank" rel="noopener noreferrer" className="text-emerald-400 hover:text-emerald-300 underline font-medium">
         3D Logo Reveal ↗
-      </Link>
+      </a>
       <span className="hidden sm:inline">•</span>
       <Link href="/storelab-3d" className="text-emerald-400 hover:text-emerald-300 underline font-medium">
         3D Studio
